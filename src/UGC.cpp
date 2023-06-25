@@ -387,7 +387,7 @@ EXTERN int luasteam_removeDependency(lua_State *L) {
 namespace luasteam {
 
 void add_UGC(lua_State *L) {
-    lua_createtable(L, 0, 17);
+    lua_createtable(L, 0, 19);
     add_func(L, "createItem", luasteam_createItem);
     add_func(L, "startItemUpdate", luasteam_startItemUpdate);
     add_func(L, "setItemContent", luasteam_setItemContent);
@@ -405,6 +405,8 @@ void add_UGC(lua_State *L) {
     add_func(L, "stopPlaytimeTrackingForAllItems", luasteam_stopPlaytimeTrackingForAllItems);
     add_func(L, "subscribeItem", luasteam_subscribeItem);
     add_func(L, "unsubscribeItem", luasteam_unsubscribeItem);
+    add_func(L, "addDependency", luasteam_addDependency);
+    add_func(L, "removeDependency", luasteam_removeDependency);
     lua_setfield(L, -2, "UGC");
 }
 
