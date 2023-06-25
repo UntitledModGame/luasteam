@@ -70,7 +70,7 @@ EXTERN int luasteam_getAuthSessionTicket(lua_State *L) {
     uint32 pcbTicket = 0;
     void *pTicket = malloc(1024);
 
-    HAuthTicket ticket = SteamUser()->GetAuthSessionTicket(pTicket, 1024, &pcbTicket);
+    HAuthTicket ticket = SteamUser()->GetAuthSessionTicket(pTicket, 1024, &pcbTicket, nullptr);
 
     if (ticket != k_HAuthTicketInvalid) {
         std::string hexTicket = bufferToHex(pTicket, pcbTicket);

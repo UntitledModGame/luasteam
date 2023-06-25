@@ -135,6 +135,51 @@ template <> void CallResultListener<RemoteStorageUnsubscribePublishedFileResult_
     delete this;
 }
 
+
+
+template <> void CallResultListener<RemoveUGCDependencyResult_t>::Result(RemoveUGCDependencyResult_t *data, bool io_fail) {
+    lua_State *L = luasteam::global_lua_state;
+    // getting stored callback function
+    lua_rawgeti(L, LUA_REGISTRYINDEX, callback_ref);
+    luaL_unref(L, LUA_REGISTRYINDEX, callback_ref);
+    // calling function
+    if (io_fail)
+        lua_pushnil(L);
+    else {
+        lua_createtable(L, 0, 2);
+        lua_pushnumber(L, data->m_eResult);
+        lua_setfield(L, -2, "result");
+        luasteam::pushuint64(L, data->m_nPublishedFileId);
+        lua_setfield(L, -2, "publishedFileId");
+    }
+    lua_pushboolean(L, io_fail);
+    lua_call(L, 2, 0);
+    delete this;
+}
+
+
+template <> void CallResultListener<AddUGCDependencyResult_t>::Result(AddUGCDependencyResult_t *data, bool io_fail) {
+    lua_State *L = luasteam::global_lua_state;
+    // getting stored callback function
+    lua_rawgeti(L, LUA_REGISTRYINDEX, callback_ref);
+    luaL_unref(L, LUA_REGISTRYINDEX, callback_ref);
+    // calling function
+    if (io_fail)
+        lua_pushnil(L);
+    else {
+        lua_createtable(L, 0, 2);
+        lua_pushnumber(L, data->m_eResult);
+        lua_setfield(L, -2, "result");
+        luasteam::pushuint64(L, data->m_nPublishedFileId);
+        lua_setfield(L, -2, "publishedFileId");
+    }
+    lua_pushboolean(L, io_fail);
+    lua_call(L, 2, 0);
+    delete this;
+}
+
+
+
 } // namespace luasteam
 
 // SteamAPICall_t CreateItem( AppId_t nConsumerAppId, EWorkshopFileType eFileType );
