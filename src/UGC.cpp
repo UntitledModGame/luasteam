@@ -358,6 +358,32 @@ EXTERN int luasteam_unsubscribeItem(lua_State *L) {
     return 0;
 }
 
+// SteamAPICall_t AddDependency( PublishedFileId_t nParentPublishedFileID, PublishedFileId_t nChildPublishedFileID );
+EXTERN int luasteam_addDependency(lua_State *L) {
+    uint64 pubFileId = luasteam::checkuint64(L, 1);
+    uint64 nChildPubFileId = luasteam::checkuint64(L, 2);
+    luaL_checktype(L, 3, LUA_TFUNCTION);
+    auto *listener = new CallResultListener<AddUGCDependencyResult_t>();
+    lua_settop(L, 2);
+    listener->callback_ref = luaL_ref(L, LUA_REGISTRYINDEX);
+    SteamAPICall_t call = SteamUGC()->AddDependency(pubFileId, nChildPubFileId);
+    listener->call_result.Set(call, listener, &CallResultListener<AddUGCDependencyResult_t>::Result);
+    return 0;
+}
+// SteamAPICall_t RemoveDependency( PublishedFileId_t nParentPublishedFileID, PublishedFileId_t nChildPublishedFileID );
+EXTERN int luasteam_removeDependency(lua_State *L) {
+    uint64 pubFileId = luasteam::checkuint64(L, 1);
+    uint64 nChildPubFileId = luasteam::checkuint64(L, 2);
+    luaL_checktype(L, 3, LUA_TFUNCTION);
+    auto *listener = new CallResultListener<RemoveUGCDependencyResult_t>();
+    lua_settop(L, 2);
+    listener->callback_ref = luaL_ref(L, LUA_REGISTRYINDEX);
+    SteamAPICall_t call = SteamUGC()->RemoveDependency(pubFileId, nChildPubFileId);
+    listener->call_result.Set(call, listener, &CallResultListener<RemoveUGCDependencyResult_t>::Result);
+    return 0;
+}
+
+
 namespace luasteam {
 
 void add_UGC(lua_State *L) {
