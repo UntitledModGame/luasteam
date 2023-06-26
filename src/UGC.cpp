@@ -183,6 +183,33 @@ template <> void CallResultListener<AddUGCDependencyResult_t>::Result(AddUGCDepe
 }
 
 
+template <> void CallResultListener<WorkshopEULAStatus_t>::Result(WorkshopEULAStatus_t *data, bool io_fail) {
+    lua_State *L = luasteam::global_lua_state;
+    // getting stored callback function
+    lua_rawgeti(L, LUA_REGISTRYINDEX, callback_ref);
+    luaL_unref(L, LUA_REGISTRYINDEX, callback_ref);
+    // calling function
+    if (io_fail)
+        lua_pushnil(L);
+    else {
+        lua_createtable(L, 0, 5);
+        lua_pushnumber(L, data->m_eResult);
+        lua_setfield(L, -2, "result");
+        lua_pushnumber(L, data->m_nAppID);
+        lua_setfield(L, -2, "appId");
+        lua_pushnumber(L, data->m_unVersion);
+        lua_setfield(L, -2, "version");
+        lua_pushnumber(L, data->m_rtAction);
+        lua_setfield(L, -2, "needsAction");
+        lua_pushboolean(L, data->m_bAccepted);
+        lua_setfield(L, -2, "accepted");
+        lua_pushboolean(L, data->m_bNeedsAction);
+        lua_setfield(L, -2, "needsAction");
+    }
+    lua_pushboolean(L, io_fail);
+    lua_call(L, 2, 0);
+    delete this;
+}
 
 } // namespace luasteam
 
