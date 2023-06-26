@@ -146,11 +146,13 @@ template <> void CallResultListener<RemoveUGCDependencyResult_t>::Result(RemoveU
     if (io_fail)
         lua_pushnil(L);
     else {
-        lua_createtable(L, 0, 2);
+        lua_createtable(L, 0, 3);
         lua_pushnumber(L, data->m_eResult);
         lua_setfield(L, -2, "result");
         luasteam::pushuint64(L, data->m_nPublishedFileId);
         lua_setfield(L, -2, "publishedFileId");
+        luasteam::pushuint64(L, data->m_nChildPublishedFileId);
+        lua_setfield(L, -2, "childPublishedFileId");
     }
     lua_pushboolean(L, io_fail);
     lua_call(L, 2, 0);
@@ -167,11 +169,13 @@ template <> void CallResultListener<AddUGCDependencyResult_t>::Result(AddUGCDepe
     if (io_fail)
         lua_pushnil(L);
     else {
-        lua_createtable(L, 0, 2);
+        lua_createtable(L, 0, 3);
         lua_pushnumber(L, data->m_eResult);
         lua_setfield(L, -2, "result");
         luasteam::pushuint64(L, data->m_nPublishedFileId);
         lua_setfield(L, -2, "publishedFileId");
+        luasteam::pushuint64(L, data->m_nChildPublishedFileId);
+        lua_setfield(L, -2, "childPublishedFileId");
     }
     lua_pushboolean(L, io_fail);
     lua_call(L, 2, 0);
@@ -429,10 +433,29 @@ EXTERN int luasteam_removeDependency(lua_State *L) {
 }
 
 
+// bool ShowWorkshopEULA();
+EXTERN int luasteam_showWorkshopEULA(lua_State *L) {
+    bool ok = SteamUGC()->ShowWorkshopEULA();
+    lua_pushboolean(L, ok);
+    return 0;
+}
+
+// SteamAPICall_t GetWorkshopEULAStatus();
+EXTERN int luasteam_getWorkshopEULAStatus(lua_State *L) {
+    luaL_checktype(L, 1, LUA_TFUNCTION);
+    auto *listener = new CallResultListener<WorkshopEULAStatus_t>();
+    lua_settop(L, 1);
+    listener->callback_ref = luaL_ref(L, LUA_REGISTRYINDEX);
+    SteamAPICall_t call = SteamUGC()->GetWorkshopEULAStatus();
+    listener->call_result.Set(call, listener, &CallResultListener<WorkshopEULAStatus_t>::Result);
+    return 0;   
+}
+
+
 namespace luasteam {
 
 void add_UGC(lua_State *L) {
-    lua_createtable(L, 0, 19);
+    lua_createtable(L, 0, 21);
     add_func(L, "createItem", luasteam_createItem);
     add_func(L, "startItemUpdate", luasteam_startItemUpdate);
     add_func(L, "setItemContent", luasteam_setItemContent);
@@ -452,6 +475,8 @@ void add_UGC(lua_State *L) {
     add_func(L, "unsubscribeItem", luasteam_unsubscribeItem);
     add_func(L, "addDependency", luasteam_addDependency);
     add_func(L, "removeDependency", luasteam_removeDependency);
+    add_func(L, "showWorkshopEULA", luasteam_showWorkshopEULA);
+    add_func(L, "getWorkshopEULAStatus", luasteam_getWorkshopEULAStatus);
     lua_setfield(L, -2, "UGC");
 }
 
