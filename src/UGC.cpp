@@ -136,6 +136,16 @@ template <> void CallResultListener<RemoteStorageUnsubscribePublishedFileResult_
 }
 
 
+static void PushDependencyResult(lua_State *L, EResult result, PublishedFileId_t published, PublishedFileId_t child) {
+    // Used by remove/add dependency callbacks
+    lua_createtable(L, 0, 3);
+    lua_pushnumber(L, result);
+    lua_setfield(L, -2, "result");
+    luasteam::pushuint64(L, published);
+    lua_setfield(L, -2, "publishedFileId");
+    luasteam::pushuint64(L, child);
+    lua_setfield(L, -2, "childPublishedFileId");
+}
 
 template <> void CallResultListener<RemoveUGCDependencyResult_t>::Result(RemoveUGCDependencyResult_t *data, bool io_fail) {
     lua_State *L = luasteam::global_lua_state;
@@ -146,13 +156,7 @@ template <> void CallResultListener<RemoveUGCDependencyResult_t>::Result(RemoveU
     if (io_fail)
         lua_pushnil(L);
     else {
-        lua_createtable(L, 0, 3);
-        lua_pushnumber(L, data->m_eResult);
-        lua_setfield(L, -2, "result");
-        luasteam::pushuint64(L, data->m_nPublishedFileId);
-        lua_setfield(L, -2, "publishedFileId");
-        luasteam::pushuint64(L, data->m_nChildPublishedFileId);
-        lua_setfield(L, -2, "childPublishedFileId");
+        PushDependencyResult(L, data->m_eResult, data->m_nPublishedFileId, data->m_nChildPublishedFileId);
     }
     lua_pushboolean(L, io_fail);
     lua_call(L, 2, 0);
@@ -169,13 +173,7 @@ template <> void CallResultListener<AddUGCDependencyResult_t>::Result(AddUGCDepe
     if (io_fail)
         lua_pushnil(L);
     else {
-        lua_createtable(L, 0, 3);
-        lua_pushnumber(L, data->m_eResult);
-        lua_setfield(L, -2, "result");
-        luasteam::pushuint64(L, data->m_nPublishedFileId);
-        lua_setfield(L, -2, "publishedFileId");
-        luasteam::pushuint64(L, data->m_nChildPublishedFileId);
-        lua_setfield(L, -2, "childPublishedFileId");
+        PushDependencyResult(L, data->m_eResult, data->m_nPublishedFileId, data->m_nChildPublishedFileId);
     }
     lua_pushboolean(L, io_fail);
     lua_call(L, 2, 0);
