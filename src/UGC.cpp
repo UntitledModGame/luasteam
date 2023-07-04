@@ -341,6 +341,17 @@ EXTERN int luasteam_getItemInstallInfo(lua_State *L) {
         return 1;
 }
 
+// bool GetItemDownloadInfo( PublishedFileId_t nPublishedFileID, uint64 *punBytesDownloaded, uint64 *punBytesTotal );
+EXTERN int luasteam_getItemDownloadInfo(lua_State *L) {
+    uint64 id = luasteam::checkuint64(L, 1);
+    uint64 bytesDownloaded = 0;
+    uint64 bytesTotal = 0;
+    SteamUGC()->GetItemDownloadInfo(id, &bytesDownloaded, &bytesTotal);
+    lua_pushnumber(L, bytesDownloaded);
+    lua_pushnumber(L, bytesTotal);
+    return 0;   
+}
+
 // EItemUpdateStatus GetItemUpdateProgress( UGCUpdateHandle_t handle, uint64 *punBytesProcessed, uint64*punBytesTotal );
 EXTERN int luasteam_getItemUpdateProgress(lua_State *L) {
     uint64 handle = luasteam::checkuint64(L, 1);
@@ -477,10 +488,11 @@ EXTERN int luasteam_getWorkshopEULAStatus(lua_State *L) {
 }
 
 
+
 namespace luasteam {
 
 void add_UGC(lua_State *L) {
-    lua_createtable(L, 0, 21);
+    lua_createtable(L, 0, 22);
     add_func(L, "createItem", luasteam_createItem);
     add_func(L, "startItemUpdate", luasteam_startItemUpdate);
     add_func(L, "setItemContent", luasteam_setItemContent);
@@ -492,6 +504,7 @@ void add_UGC(lua_State *L) {
     add_func(L, "getSubscribedItems", luasteam_getSubscribedItems);
     add_func(L, "getItemState", luasteam_getItemState);
     add_func(L, "getItemInstallInfo", luasteam_getItemInstallInfo);
+    add_func(L, "getItemDownloadInfo", luasteam_getItemDownloadInfo);
     add_func(L, "getItemUpdateProgress", luasteam_getItemUpdateProgress);
     add_func(L, "startPlaytimeTracking", luasteam_startPlaytimeTracking);
     add_func(L, "stopPlaytimeTracking", luasteam_stopPlaytimeTracking);
